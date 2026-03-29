@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+             font-src 'self' https://fonts.gstatic.com;
+             script-src 'self';"/>
+  <title>Mnemosyne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ TITLE BAR ══════════════════════════════════════════════════════════ -->
+  <div id="title-bar">
+    <div id="title-left">
+      <img id="app-mark" src="../build/icon.png" alt="Mnemosyne"/>
+      <div id="nb-selector" title="Switch notebook">
+        <span id="nb-selector-name">Select notebook</span>
+        <span id="nb-arrow">▾</span>
+        <div id="nb-dropdown">
+          <div id="nb-dropdown-list"></div>
+          <div id="nb-dropdown-footer">
+            <button id="btn-nb-new-dd">+ New notebook</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="title-right">
+      <button id="btn-settings" class="title-btn" title="Settings">⚙ Settings</button>
+      <button id="btn-import" class="title-btn" title="Import notes from PDF or text">⬆ Import</button>
+      <button id="btn-export" class="title-btn" title="Export notes">⬇ Export</button>
+      <button id="btn-open-decay" class="title-btn decay-btn" title="Knowledge Decay Tracker">
+        ⟳ Decay Tracker
+        <span id="decay-due-badge" style="display:none"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SECTION TABS ════════════════════════════════════════════════════════ -->
+  <div id="section-bar">
+    <div id="section-tabs"></div>
+    <button id="btn-add-sec" title="Add section">+</button>
+  </div>
+
+  <!-- ══ NOTES BODY ══════════════════════════════════════════════════════════ -->
+  <div id="notes-body">
+
+    <!-- EDITOR -->
+    <div id="editor-area">
+
+      <!-- Toolbar -->
+      <div id="toolbar" style="display:none">
+        <div class="tb-group">
+          <button class="tb" data-cmd="bold"         title="Bold"><b>B</b></button>
+          <button class="tb" data-cmd="italic"       title="Italic"><i>I</i></button>
+          <button class="tb" data-cmd="underline"    title="Underline"><u>U</u></button>
+          <button class="tb" data-cmd="strikeThrough"title="Strikethrough"><s>S</s></button>
+        </div>
+        <div class="tb-sep"></div>
+        <div class="tb-group">
+          <button class="tb" data-cmd="h1" title="Heading 1">H1</button>
+          <button class="tb" data-cmd="h2" title="Heading 2">H2</button>
+          <button class="tb" data-cmd="h3" title="Heading 3">H3</button>
+        </div>
+        <div class="tb-sep"></div>
+        <div class="tb-group">
+          <button class="tb" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+          <button class="tb" data-cmd="insertOrderedList"   title="Numbered list">1. List</button>
+        </div>
+        <div class="tb-sep"></div>
+        <div class="tb-group">
+          <select id="font-family" class="tb-select" title="Font">
+            <option value="Inter, sans-serif" selected>Sans</option>
+            <option value="'Lora', serif">Serif</option>
+            <option value="'JetBrains Mono', monospace">Mono</option>
+          </select>
+          <select id="font-size" class="tb-select" title="Size">
+            <option value="13px">13</option>
+            <option value="15px" selected>15</option>
+            <option value="17px">17</option>
+            <option value="20px">20</option>
+            <option value="24px">24</option>
+            <option value="30px">30</option>
+            <option value="36px">36</option>
+          </select>
+        </div>
+        <div class="tb-flex"></div>
+        <button id="btn-highlight-sel" class="tb tb-star"  title="Mark selection as Important — tracks in Decay">⭐ Mark Important</button>
+        <button id="btn-quiz"          class="tb tb-quiz"  title="Generate a self-test questionnaire from your notes">📝 Take a Quiz</button>
+        <div class="tb-sep"></div>
+        <button id="btn-track-page" class="tb tb-track" style="display:none" title="Track this page in Decay Tracker">＋ Track Page</button>
+        <button id="btn-del-page"   class="tb tb-danger" style="display:none" title="Delete page">🗑</button>
+      </div>
+
+      <!-- Canvas -->
+      <div id="canvas-scroll">
+        <div id="canvas-empty">
+          <div class="empty-mu">μ</div>
+          <p>Select a notebook above</p>
+          <p class="empty-sub">then pick a section and open a page</p>
+        </div>
+        <div id="page-editor" style="display:none">
+          <input  id="page-title-inp" class="page-title-inp" type="text" placeholder="Page title" spellcheck="true"/>
+          <div    id="page-meta"></div>
+          <div    id="editor-body" contenteditable="true" spellcheck="true" data-placeholder="Start writing…"></div>
+          <div    id="save-status"></div>
+          <!-- Note health warning (hidden by default) -->
+          <div    id="note-health-bar" style="display:none">
+            <span id="note-health-msg"></span>
+            <div  id="note-health-actions">
+              <button id="btn-nh-expand">Expand note</button>
+              <button id="btn-nh-dismiss">Review anyway</button>
+              <button id="btn-nh-ignore">Don't warn again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PAGE SIDEBAR (right, OneNote-style) -->
+    <div id="page-sidebar">
+      <div id="page-sidebar-header">
+        <span class="sidebar-label">PAGES</span>
+        <button id="btn-add-page" class="add-page-btn">+ Add Page</button>
+      </div>
+      <div id="page-list"></div>
+    </div>
+
+  </div><!-- /#notes-body -->
+
+  <!-- ══ DECAY OVERLAY ════════════════════════════════════════════════════════ -->
+  <div id="decay-overlay" style="display:none">
+
+    <div id="decay-topbar">
+      <div id="decay-brand">
+        <span id="decay-brand-icon">⟳</span>
+        <span id="decay-brand-name">Knowledge Decay Tracker</span>
+      </div>
+      <button id="btn-close-decay" class="title-btn">← Back to Notes</button>
+    </div>
+
+    <!-- Stats -->
+    <div id="decay-stats">
+      <div class="dstat critical"><div class="dstat-n" id="ds-crit">0</div><div class="dstat-l">Critical</div></div>
+      <div class="dstat fading"><div  class="dstat-n" id="ds-fade">0</div><div class="dstat-l">Fading</div></div>
+      <div class="dstat stable"><div  class="dstat-n" id="ds-stab">0</div><div class="dstat-l">Stable</div></div>
+      <div class="dstat total"><div   class="dstat-n" id="ds-tot">0</div><div class="dstat-l">Total</div></div>
+    </div>
+
+    <!-- View switcher + controls -->
+    <div id="decay-controls">
+      <div id="decay-view-tabs">
+        <button class="dvt active" data-view="focus">Focus</button>
+        <button class="dvt" data-view="heatmap">Heatmap</button>
+        <button class="dvt" data-view="list">Full list</button>
+      </div>
+      <div id="decay-filters">
+        <button class="df active" data-f="all">All</button>
+        <button class="df" data-f="critical">Critical</button>
+        <button class="df" data-f="fading">Fading</button>
+        <button class="df" data-f="stable">Stable</button>
+      </div>
+      <input id="con-search" type="text" placeholder="Search concepts…"/>
+    </div>
+
+    <!-- Views -->
+    <div id="decay-main">
+      <div id="decay-left">
+        <!-- Focus view -->
+        <div id="view-focus" class="decay-view"></div>
+        <!-- Heatmap view -->
+        <div id="view-heatmap" class="decay-view" style="display:none"></div>
+        <!-- Full list view -->
+        <div id="view-list-wrap" style="display:none">
+          <div id="sort-bar">
+            <span class="sort-label">Sort by</span>
+            <button class="sort-btn active" data-sort="confidence">Confidence <span class="sort-arrow">↑</span></button>
+            <button class="sort-btn" data-sort="name">Name <span class="sort-arrow"></span></button>
+            <button class="sort-btn" data-sort="subject">Subject <span class="sort-arrow"></span></button>
+            <button class="sort-btn" data-sort="date">Date added <span class="sort-arrow"></span></button>
+          </div>
+          <div id="view-list" class="decay-view"></div>
+        </div>
+      </div>
+
+      <!-- Detail panel -->
+      <div id="decay-right" style="display:none">
+        <div id="concept-detail"></div>
+      </div>
+    </div>
+
+    <!-- REVIEW MODAL (inside decay overlay) -->
+    <div id="review-modal" style="display:none">
+      <div id="review-box">
+        <div id="review-stage-ready">
+          <div id="review-concept-name"></div>
+          <div id="review-concept-sub"></div>
+          <div id="review-conf-bar-wrap">
+            <div id="review-conf-label">Current confidence</div>
+            <div id="review-conf-bar"><div id="review-conf-fill"></div></div>
+            <div id="review-conf-pct"></div>
+          </div>
+          <button id="btn-review-ready" class="btn-pri">I'm Ready →</button>
+          <button id="btn-review-skip"  class="btn-ghost">Skip for now</button>
+        </div>
+        <!-- MCQ stage (AI enabled) -->
+        <div id="review-stage-mcq" style="display:none">
+          <div id="mcq-question-text"></div>
+          <div id="mcq-options"></div>
+          <div id="mcq-feedback" style="display:none"></div>
+          <div id="mcq-explanation" style="display:none"></div>
+        </div>
+
+        <!-- Self-rate stage (no AI / fallback) -->
+        <div id="review-stage-rate" style="display:none">
+          <div id="review-q-label">How well do you remember this?</div>
+          <div id="review-concept-name-2"></div>
+          <div id="review-ratings">
+            <button class="rate-btn" data-r="1"><span class="rate-emoji">😰</span><span class="rate-lbl">Blank</span></button>
+            <button class="rate-btn" data-r="2"><span class="rate-emoji">😕</span><span class="rate-lbl">Vague</span></button>
+            <button class="rate-btn" data-r="3"><span class="rate-emoji">😐</span><span class="rate-lbl">Partial</span></button>
+            <button class="rate-btn" data-r="4"><span class="rate-emoji">🙂</span><span class="rate-lbl">Clear</span></button>
+            <button class="rate-btn" data-r="5"><span class="rate-emoji">😄</span><span class="rate-lbl">Perfect</span></button>
+          </div>
+        </div>
+        <div id="review-stage-result" style="display:none">
+          <div id="review-result-icon"></div>
+          <div id="review-result-msg"></div>
+          <div id="review-result-next"></div>
+          <!-- Struggle mode (shows if rating ≤ 2 twice) -->
+          <div id="struggle-mode" style="display:none">
+            <div id="struggle-title">Let's get you back on track</div>
+            <div id="struggle-simplification"></div>
+            <div id="struggle-note-link"></div>
+            <div id="struggle-actions">
+              <button id="btn-struggle-example">See a quick example?</button>
+              <button id="btn-struggle-reset">Mark as needs re-learning</button>
+            </div>
+          </div>
+          <button id="btn-review-next" class="btn-pri" style="margin-top:20px">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#decay-overlay -->
+
+</div><!-- /#app -->
+
+<!-- ══ MODALS ══════════════════════════════════════════════════════════════════ -->
+
+<!-- New notebook -->
+<div id="modal-nb" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="mhd"><h2>New notebook</h2><button class="mx" data-close="modal-nb">✕</button></div>
+    <div class="mbd">
+      <label class="ml">Name</label>
+      <input id="nb-name-inp" class="mi" type="text" placeholder="e.g. MTH302, Physics…" autocomplete="off"/>
+      <label class="ml mt">Colour</label>
+      <div id="nb-colors" class="color-row"></div>
+    </div>
+    <div class="mft">
+      <button class="btn-sec" data-close="modal-nb">Cancel</button>
+      <button id="btn-nb-ok" class="btn-pri">Create notebook</button>
+    </div>
+  </div>
+</div>
+
+<!-- New section -->
+<div id="modal-sec" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="mhd"><h2>New section</h2><button class="mx" data-close="modal-sec">✕</button></div>
+    <div class="mbd">
+      <label class="ml">Section name</label>
+      <input id="sec-name-inp" class="mi" type="text" placeholder="e.g. Unit 1, Week 3…" autocomplete="off"/>
+      <label class="ml mt">Colour</label>
+      <div id="sec-colors" class="color-row"></div>
+    </div>
+    <div class="mft">
+      <button class="btn-sec" data-close="modal-sec">Cancel</button>
+      <button id="btn-sec-ok" class="btn-pri">Create section</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import -->
+<div id="modal-import" class="modal-overlay" style="display:none">
+  <div class="modal" style="width:520px">
+    <div class="mhd">
+      <h2>⬆ Import Notes</h2>
+      <button class="mx" data-close="modal-import">✕</button>
+    </div>
+    <div class="mbd">
+      <p style="font-size:13px;color:#6b7280;margin-bottom:18px">
+        Import a PDF, plain text, or Markdown file as a new page in the currently selected section.
+      </p>
+
+      <!-- Destination info -->
+      <div id="import-destination" class="import-dest-box">
+        <span id="import-dest-label">📂 Importing into: <strong id="import-dest-name">—</strong></span>
+      </div>
+
+      <!-- File type icons -->
+      <div class="import-types">
+        <div class="import-type-card" data-type="pdf">
+          <div class="import-type-icon">📄</div>
+          <div class="import-type-name">PDF</div>
+          <div class="import-type-desc">Extract text from a PDF document</div>
+        </div>
+        <div class="import-type-card" data-type="txt">
+          <div class="import-type-icon">📝</div>
+          <div class="import-type-name">Text / Markdown</div>
+          <div class="import-type-desc">Import a .txt or .md file as a note</div>
+        </div>
+      </div>
+
+      <!-- Progress / result area -->
+      <div id="import-status" style="display:none" class="import-status-box">
+        <div id="import-status-text"></div>
+      </div>
+
+      <!-- Preview -->
+      <div id="import-preview-wrap" style="display:none">
+        <label class="ml mt">Page title</label>
+        <input id="import-page-title" class="mi" type="text" placeholder="Page title" style="margin-bottom:12px"/>
+        <label class="ml">Content preview</label>
+        <textarea id="import-preview" class="mi" rows="7"
+          style="font-size:12px;font-family:monospace;resize:vertical;line-height:1.5"
+          readonly></textarea>
+        <p style="font-size:11px;color:#9ca3af;margin-top:6px">
+          The full content will be imported as a new page — the preview shows the first 500 characters.
+        </p>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn-sec" data-close="modal-import">Cancel</button>
+      <button id="btn-import-pick" class="btn-pri">📂 Choose file…</button>
+      <button id="btn-import-confirm" class="btn-pri" style="display:none">✓ Import page</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export -->
+<div id="modal-export" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="mhd"><h2>Export your data</h2><button class="mx" data-close="modal-export">✕</button></div>
+    <div class="mbd">
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px">All your notes, highlights, and decay history — yours to keep.</p>
+      <button id="btn-export-md"   class="export-opt">📝 Markdown — readable text export</button>
+      <button id="btn-export-json" class="export-opt">📦 JSON — complete data with decay history</button>
+      <button id="btn-export-pdf"  class="export-opt">📄 PDF — formatted notebook for printing</button>
+    </div>
+    <div class="mft">
+      <button class="btn-sec" data-close="modal-export">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-settings" class="modal-overlay" style="display:none">
+  <div class="modal" style="width:500px">
+    <div class="mhd"><h2>⚙ Settings</h2><button class="mx" data-close="modal-settings">✕</button></div>
+    <div class="mbd">
+
+      <div class="settings-section-label">AI QUESTION GENERATION</div>
+      <p class="settings-desc">Paste your GitHub personal access token to enable AI-generated review questions from your notes. Stored locally on your device only.</p>
+
+      <label class="ml mt">GitHub Token</label>
+      <div class="token-input-wrap">
+        <input id="settings-token" class="mi token-inp" type="password"
+               placeholder="ghp_... or github_pat_..." autocomplete="off" spellcheck="false"/>
+        <button id="btn-token-reveal" class="token-reveal-btn" title="Show/hide token">👁</button>
+      </div>
+      <div id="token-status" class="token-status"></div>
+      <button id="btn-token-clear" class="btn-token-clear" style="display:none" title="Remove saved token and deactivate AI features">✕ Remove token &amp; deactivate</button>
+
+      <label class="ml mt">AI Model</label>
+      <select id="settings-model" class="mi" style="padding:8px 12px">
+        <option value="openai/gpt-4o-mini">GPT-4o mini — fast and free</option>
+        <option value="openai/gpt-4o">GPT-4o — higher quality</option>
+        <option value="openai/gpt-5" selected>GPT-5 — best quality</option>
+      </select>
+
+      <div class="settings-section-label" style="margin-top:20px">HOW TO GET A TOKEN</div>
+      <div class="settings-steps">
+        <div class="settings-step">1. Go to github.com → Settings → Developer settings</div>
+        <div class="settings-step">2. Personal access tokens → Tokens (classic)</div>
+        <div class="settings-step">3. Generate new token — no scopes needed</div>
+        <div class="settings-step">4. Paste it above and click Save</div>
+      </div>
+
+    </div>
+    <div class="mft">
+      <button class="btn-sec" data-close="modal-settings">Cancel</button>
+      <button id="btn-settings-save" class="btn-pri">Save settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTIONNAIRE MODAL -->
+<div id="modal-quiz" class="modal-overlay" style="display:none">
+  <div class="modal quiz-modal">
+
+    <!-- Scope selector stage -->
+    <div id="quiz-stage-scope">
+      <div class="mhd">
+        <h2>📝 Take a Quiz</h2>
+        <button class="mx" data-close="modal-quiz">✕</button>
+      </div>
+      <div class="mbd">
+        <p class="settings-desc">Generate a self-test questionnaire from your notes. Results will update your decay tracker for concepts below 60% confidence.</p>
+        <label class="ml mt">Quiz scope</label>
+        <div id="quiz-scope-options" class="quiz-scope-opts">
+          <button class="quiz-scope-btn active" data-scope="page">📄 This page only</button>
+          <button class="quiz-scope-btn" data-scope="section">📑 Whole section</button>
+          <button class="quiz-scope-btn" data-scope="notebook">📓 Whole notebook</button>
+        </div>
+        <div id="quiz-scope-desc" class="quiz-scope-desc"></div>
+        <label class="ml mt">Number of questions</label>
+        <div class="quiz-count-row">
+          <input id="quiz-count" type="range" min="3" max="10" value="5" step="1"/>
+          <span id="quiz-count-val">5 questions</span>
+        </div>
+      </div>
+      <div class="mft">
+        <button class="btn-sec" data-close="modal-quiz">Cancel</button>
+        <button id="btn-quiz-start" class="btn-pri">Generate Quiz →</button>
+      </div>
+    </div>
+
+    <!-- Loading stage -->
+    <div id="quiz-stage-loading" style="display:none">
+      <div class="quiz-loading-body">
+        <div class="quiz-spinner"></div>
+        <div class="quiz-loading-msg">Generating questions from your notes…</div>
+        <div class="quiz-loading-sub">This takes a few seconds</div>
+      </div>
+    </div>
+
+    <!-- Question stage -->
+    <div id="quiz-stage-question" style="display:none">
+      <div class="quiz-header">
+        <div id="quiz-progress-label"></div>
+        <div id="quiz-progress-bar-wrap">
+          <div id="quiz-progress-bar"></div>
+        </div>
+      </div>
+      <div class="quiz-question-body">
+        <div id="quiz-topic-label"></div>
+        <div id="quiz-question-text"></div>
+        <div id="quiz-options"></div>
+        <div id="quiz-explanation" style="display:none"></div>
+      </div>
+      <div class="quiz-question-footer">
+        <button id="btn-quiz-next" class="btn-pri" style="display:none">Next →</button>
+      </div>
+    </div>
+
+    <!-- Results stage -->
+    <div id="quiz-stage-results" style="display:none">
+      <div class="mhd">
+        <h2>Quiz Complete</h2>
+        <button class="mx" data-close="modal-quiz">✕</button>
+      </div>
+      <div class="quiz-results-body">
+        <div id="quiz-score-display"></div>
+        <div id="quiz-results-list"></div>
+        <div id="quiz-decay-summary"></div>
+      </div>
+      <div class="mft">
+        <button class="btn-sec" data-close="modal-quiz">Close</button>
+        <button id="btn-quiz-retake" class="btn-pri">Retake Quiz</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast" class="toast" style="display:none;opacity:0"></div>
+<script src="renderer.js"></script>
+</body>
+</html>

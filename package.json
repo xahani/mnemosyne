@@ -1,0 +1,19 @@
+{
+  "name": "mnemosyne",
+  "version": "1.0.0",
+  "description": "Personal Knowledge Decay Tracker",
+  "main": "main.js",
+  "author": "Mnemosyne",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.2"
+  }
+}

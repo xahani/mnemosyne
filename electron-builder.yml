@@ -1,0 +1,30 @@
+appId: com.mnemosyne.app
+productName: Mnemosyne
+directories:
+  output: dist
+files:
+  - "**/*"
+  - "!dist/**"
+  - "!node_modules/.cache/**"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.ico
+  executableName: Mnemosyne
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Mnemosyne
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeaderIcon: build/icon.ico
+mac:
+  target: [dmg]
+  icon: build/icon.icns
+linux:
+  target: [AppImage, deb]
+  icon: build/icons
+publish: null
