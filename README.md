@@ -1,4 +1,4 @@
-# 🧠 Mnemosyne
+# Mnemosyne
 
 > *Your notes shouldn't just sit there. They should teach you.*
 
@@ -8,7 +8,7 @@ Write your notes, highlight what matters, and let Mnemosyne do the rest — quiz
 
 ---
 
-## ✨ Features
+## Features
 
 - **Notebooks → Sections → Pages** — clean hierarchy for organizing everything you learn
 - **Knowledge Decay Tracker** — concepts fade over time; Mnemosyne surfaces them before you forget
@@ -22,7 +22,7 @@ Write your notes, highlight what matters, and let Mnemosyne do the rest — quiz
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18 or higher recommended)
@@ -52,7 +52,7 @@ npm run dist:linux    # Linux
 
 ---
 
-## 🤖 Enabling AI Features
+## Enabling AI Features
 
 1. Open the app and click **⚙ Settings** in the top bar
 2. Go to [github.com](https://github.com) → Settings → Developer settings → Personal access tokens → Tokens (classic)
@@ -63,7 +63,7 @@ Your token is stored locally on your device only and never sent to any third-par
 
 ---
 
-## 🛠 Built With
+## Built With
 
 - [Electron](https://www.electronjs.org/)
 - Vanilla JavaScript
@@ -71,6 +71,6 @@ Your token is stored locally on your device only and never sent to any third-par
 
 ---
 
-## 📄 License
+## License
 
 MIT
